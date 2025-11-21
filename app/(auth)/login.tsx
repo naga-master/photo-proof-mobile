@@ -18,7 +18,7 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { useAuthStore } from '@/stores/authStore';
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/utils/haptics';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -37,7 +37,7 @@ export default function LoginScreen() {
         text1: 'Missing Information',
         text2: 'Please enter your email and password',
       });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptics.error();
       return;
     }
 
@@ -49,7 +49,7 @@ export default function LoginScreen() {
         text1: 'Invalid Email',
         text2: 'Please enter a valid email address',
       });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptics.error();
       return;
     }
 
@@ -59,7 +59,7 @@ export default function LoginScreen() {
       await login(email, password, isStudioLogin);
       
       // Success haptic feedback
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.success();
       
       Toast.show({
         type: 'success',
@@ -70,7 +70,7 @@ export default function LoginScreen() {
       // Navigate to main app
       router.replace('/(tabs)');
     } catch (error: any) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptics.error();
       
       Toast.show({
         type: 'error',

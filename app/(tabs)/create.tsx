@@ -22,7 +22,7 @@ import { photoService } from '@/services/api/photos';
 import { projectService } from '@/services/api/projects';
 import { useAuthStore } from '@/stores/authStore';
 import Toast from 'react-native-toast-message';
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/utils/haptics';
 
 interface SelectedPhoto {
   id: string;
@@ -84,7 +84,7 @@ export default function CreateScreen() {
         setSelectedPhotos([...selectedPhotos, ...processedPhotos]);
         setIsProcessing(false);
         
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        haptics.success();
       }
     } catch (error) {
       console.error('Photo picker error:', error);
@@ -98,7 +98,7 @@ export default function CreateScreen() {
   };
 
   const removePhoto = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.light();
     setSelectedPhotos(selectedPhotos.filter(p => p.id !== id));
   };
 
@@ -125,7 +125,7 @@ export default function CreateScreen() {
     }
 
     setStep('uploading');
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptics.success();
 
     try {
       // Create project first

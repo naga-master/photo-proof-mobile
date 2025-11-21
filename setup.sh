@@ -48,6 +48,17 @@ else
     exit 1
 fi
 
+# Install missing peer dependency (required for Expo Metro bundler)
+echo
+echo "📦 Installing additional peer dependencies..."
+npm install @react-native-community/cli-server-api --save-dev
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✅ Peer dependencies installed${NC}"
+else
+    echo -e "${YELLOW}⚠️  Warning: Some peer dependencies may be missing${NC}"
+fi
+
 # Get local IP address
 echo
 echo "🌐 Detecting your local IP address..."

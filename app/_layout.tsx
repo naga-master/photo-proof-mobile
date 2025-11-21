@@ -66,6 +66,12 @@ export default function RootLayout() {
               }}
             >
               <Stack.Screen 
+                name="index" 
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen 
                 name="(auth)" 
                 options={{
                   animation: 'fade',
@@ -82,6 +88,18 @@ export default function RootLayout() {
                 options={{
                   animation: 'fade',
                   presentation: 'fullScreenModal',
+                }}
+              />
+              <Stack.Screen
+                name="gallery/[id]"
+                options={{
+                  animation: 'slide_from_right',
+                }}
+              />
+              <Stack.Screen
+                name="clients"
+                options={{
+                  animation: 'slide_from_right',
                 }}
               />
             </Stack>

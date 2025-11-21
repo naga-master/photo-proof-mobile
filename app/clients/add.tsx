@@ -16,7 +16,7 @@ import { router } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { clientService } from '@/services/api/clients';
 import Toast from 'react-native-toast-message';
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/utils/haptics';
 
 export default function AddClientScreen() {
   const [name, setName] = useState('');
@@ -58,7 +58,7 @@ export default function AddClientScreen() {
     }
 
     setLoading(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptics.success();
 
     try {
       await clientService.createClient({

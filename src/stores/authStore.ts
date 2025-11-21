@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import * as SecureStore from 'expo-secure-store';
+import { storage } from '@/utils/storage';
 import { authService } from '@/services/api/auth';
 
 interface User {
@@ -54,8 +54,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       };
       
       // Store token securely
-      await SecureStore.setItemAsync('auth_token', token);
-      await SecureStore.setItemAsync('user_data', JSON.stringify(user));
+      await storage.setItem('auth_token', token);
+      await storage.setItem('user_data', JSON.stringify(user));
       
       set({
         user,
@@ -79,8 +79,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     try {
       // Clear secure storage
-      await SecureStore.deleteItemAsync('auth_token');
-      await SecureStore.deleteItemAsync('user_data');
+      await storage.removeItem('auth_token');
+      await storage.removeItem('user_data');
       
       // Call logout API
       await authService.logout();
@@ -100,8 +100,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true });
     
     try {
-      const token = await SecureStore.getItemAsync('auth_token');
-      const userData = await SecureStore.getItemAsync('user_data');
+      const token = await storage.getItem('auth_token');
+      const userData = await storage.getItem('user_data');
       
       if (token && userData) {
         const user = JSON.parse(userData);
@@ -136,7 +136,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user: updatedUser });
       
       // Update stored user data
-      SecureStore.setItemAsync('user_data', JSON.stringify(updatedUser));
+      storage.setItem('user_data', JSON.stringify(updatedUser));
     }
   },
 

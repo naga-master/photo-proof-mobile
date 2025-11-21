@@ -1,15 +1,16 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
+import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { storage } from '@/utils/storage';
 
 // API configuration
 const getApiUrl = () => {
   if (__DEV__) {
-    // Development
+    // Development - use your computer's IP address
+    // Replace with your actual IP address
     return Platform.select({
-      ios: 'http://localhost:8000',        // iOS Simulator uses localhost
-      android: 'http://10.0.2.2:8000',     // Android emulator localhost
+      ios: 'http://10.6.34.189:8000',     // Replace with your IP
+      android: 'http://10.0.2.2:8000',      // Android emulator localhost
       default: 'http://localhost:8000',
     });
   }
@@ -26,11 +27,8 @@ class ApiClient {
   }> = [];
 
   constructor() {
-    const baseURL = getApiUrl();
-    console.log('📡 API Client initialized with baseURL:', baseURL);
-    
     this.instance = axios.create({
-      baseURL,
+      baseURL: getApiUrl(),
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
@@ -44,14 +42,9 @@ class ApiClient {
     // Request interceptor
     this.instance.interceptors.request.use(
       async (config) => {
-        console.log('🚀 API Request:', config.method?.toUpperCase(), config.url);
-        try {
-          const token = await storage.getItem('auth_token');
-          if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-          }
-        } catch (error) {
-          console.warn('Failed to get auth token:', error);
+        const token = await SecureStore.getItemAsync('auth_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
       },

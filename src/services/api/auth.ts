@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import * as SecureStore from 'expo-secure-store';
+import { storage } from '@/utils/storage';
 
 interface LoginRequest {
   email: string;
@@ -31,17 +31,19 @@ export const authService = {
   async login(email: string, password: string, isStudio: boolean = false): Promise<LoginResponse> {
     const endpoint = isStudio ? '/api/auth/studio/login' : '/api/auth/client/login';
     
+    console.log('🔐 Login attempt:', { endpoint, username: email });
+    
     const response = await apiClient.post<LoginResponse>(endpoint, {
-      email,
+      username: email,  // Backend expects 'username', not 'email'
       password,
     });
 
     // Store tokens
     if (response.token) {
-      await SecureStore.setItemAsync('auth_token', response.token);
+      await storage.setItem('auth_token', response.token);
     }
     if (response.refresh_token) {
-      await SecureStore.setItemAsync('refresh_token', response.refresh_token);
+      await storage.setItem('refresh_token', response.refresh_token);
     }
 
     return response;
@@ -52,10 +54,10 @@ export const authService = {
     
     // Store tokens
     if (response.token) {
-      await SecureStore.setItemAsync('auth_token', response.token);
+      await storage.setItem('auth_token', response.token);
     }
     if (response.refresh_token) {
-      await SecureStore.setItemAsync('refresh_token', response.refresh_token);
+      await storage.setItem('refresh_token', response.refresh_token);
     }
 
     return response;
@@ -71,7 +73,7 @@ export const authService = {
   },
 
   async refreshToken(): Promise<string> {
-    const refreshToken = await SecureStore.getItemAsync('refresh_token');
+    const refreshToken = await storage.getItem('refresh_token');
     
     if (!refreshToken) {
       throw new Error('No refresh token available');
@@ -83,8 +85,8 @@ export const authService = {
     );
 
     // Store new tokens
-    await SecureStore.setItemAsync('auth_token', response.token);
-    await SecureStore.setItemAsync('refresh_token', response.refresh_token);
+    await storage.setItem('auth_token', response.token);
+    await storage.setItem('refresh_token', response.refresh_token);
 
     return response.token;
   },
