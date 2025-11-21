@@ -1,0 +1,191 @@
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+import Toast from 'react-native-toast-message';
+
+// API configuration
+const getApiUrl = () => {
+  if (__DEV__) {
+    // Development - use your computer's IP address
+    // Replace with your actual IP address
+    return Platform.select({
+      ios: 'http://192.168.1.100:8000',     // Replace with your IP
+      android: 'http://10.0.2.2:8000',      // Android emulator localhost
+      default: 'http://localhost:8000',
+    });
+  }
+  // Production
+  return 'https://api.photoproof.com';
+};
+
+class ApiClient {
+  private instance: AxiosInstance;
+  private isRefreshing = false;
+  private failedQueue: Array<{
+    resolve: (token: string) => void;
+    reject: (error: any) => void;
+  }> = [];
+
+  constructor() {
+    this.instance = axios.create({
+      baseURL: getApiUrl(),
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    this.setupInterceptors();
+  }
+
+  private setupInterceptors() {
+    // Request interceptor
+    this.instance.interceptors.request.use(
+      async (config) => {
+        const token = await SecureStore.getItemAsync('auth_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    // Response interceptor
+    this.instance.interceptors.response.use(
+      (response) => response,
+      async (error: AxiosError) => {
+        const originalRequest = error.config as any;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          if (this.isRefreshing) {
+            return new Promise((resolve, reject) => {
+              this.failedQueue.push({ resolve, reject });
+            }).then((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return this.instance(originalRequest);
+            }).catch((err) => {
+              return Promise.reject(err);
+            });
+          }
+
+          originalRequest._retry = true;
+          this.isRefreshing = true;
+
+          try {
+            const refreshToken = await SecureStore.getItemAsync('refresh_token');
+            if (!refreshToken) {
+              throw new Error('No refresh token available');
+            }
+
+            const response = await this.instance.post('/api/auth/refresh', {
+              refresh_token: refreshToken,
+            });
+
+            const { token, refresh_token } = response.data;
+
+            await SecureStore.setItemAsync('auth_token', token);
+            await SecureStore.setItemAsync('refresh_token', refresh_token);
+
+            this.processQueue(null, token);
+            
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return this.instance(originalRequest);
+          } catch (refreshError) {
+            this.processQueue(refreshError, null);
+            
+            // Clear auth and redirect to login
+            await SecureStore.deleteItemAsync('auth_token');
+            await SecureStore.deleteItemAsync('refresh_token');
+            await SecureStore.deleteItemAsync('user_data');
+            
+            // Show error toast
+            Toast.show({
+              type: 'error',
+              text1: 'Session Expired',
+              text2: 'Please log in again',
+            });
+            
+            return Promise.reject(refreshError);
+          } finally {
+            this.isRefreshing = false;
+          }
+        }
+
+        // Handle network errors
+        if (!error.response) {
+          Toast.show({
+            type: 'error',
+            text1: 'Network Error',
+            text2: 'Please check your internet connection',
+          });
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  private processQueue(error: any, token: string | null = null) {
+    this.failedQueue.forEach((prom) => {
+      if (error) {
+        prom.reject(error);
+      } else {
+        prom.resolve(token!);
+      }
+    });
+    
+    this.failedQueue = [];
+  }
+
+  // HTTP methods
+  async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.instance.get<T>(url, config);
+    return response.data;
+  }
+
+  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.instance.post<T>(url, data, config);
+    return response.data;
+  }
+
+  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.instance.put<T>(url, data, config);
+    return response.data;
+  }
+
+  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.instance.patch<T>(url, data, config);
+    return response.data;
+  }
+
+  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.instance.delete<T>(url, config);
+    return response.data;
+  }
+
+  async upload(url: string, formData: FormData, onProgress?: (progress: number) => void) {
+    const response = await this.instance.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(progress);
+        }
+      },
+    });
+    return response.data;
+  }
+
+  // Get the base URL (useful for image URLs)
+  getBaseUrl(): string {
+    return getApiUrl();
+  }
+}
+
+export const apiClient = new ApiClient();
+export const API_BASE_URL = getApiUrl();

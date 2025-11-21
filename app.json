@@ -1,0 +1,76 @@
+{
+  "expo": {
+    "name": "Photo Proof",
+    "slug": "photo-proof-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "photoproof",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.photoproof.mobile",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Photo Proof needs access to your photo library to select and upload photos.",
+        "NSPhotoLibraryAddUsageDescription": "Photo Proof needs permission to save photos to your library.",
+        "NSCameraUsageDescription": "Photo Proof needs access to your camera to take photos."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.photoproof.mobile",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_MEDIA_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to let you select and upload images."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Photo Proof to access your photos.",
+          "savePhotosPermission": "Allow Photo Proof to save photos to your photo library."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Photo Proof to use your camera to take photos."
+        }
+      ]
+    ],
+    "experiments": {
+      "tsconfigPaths": true,
+      "typedRoutes": true
+    }
+  }
+}
