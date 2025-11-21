@@ -52,6 +52,21 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {user?.role === 'studio' && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Studio</Text>
+            <View style={styles.menuContainer}>
+              <MenuItem 
+                icon="people-outline" 
+                title="Clients" 
+                onPress={() => router.push('/clients')}
+              />
+              <MenuItem icon="analytics-outline" title="Analytics" />
+              <MenuItem icon="color-palette-outline" title="Branding" isLast />
+            </View>
+          </View>
+        )}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preferences</Text>
           <View style={styles.menuContainer}>

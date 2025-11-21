@@ -40,7 +40,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const response = await authService.login(email, password, isStudio);
       
-      const { user, token } = response;
+      const { user: userData, token } = response;
+      
+      // Transform user data to match User interface
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        role: userData.role as 'studio' | 'client',
+        studioId: userData.studio_id,
+        clientId: userData.client_id,
+        avatar: userData.avatar,
+      };
       
       // Store token securely
       await SecureStore.setItemAsync('auth_token', token);

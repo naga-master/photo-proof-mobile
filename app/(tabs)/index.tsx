@@ -35,6 +35,10 @@ interface Stats {
   totalPhotos: number;
   activeClients: number;
   pendingUploads: number;
+  totalViews: number;
+  favoriteCount: number;
+  storageUsed: string;
+  thisMonthGalleries: number;
 }
 
 export default function HomeScreen() {
@@ -46,6 +50,10 @@ export default function HomeScreen() {
     totalPhotos: 0,
     activeClients: 0,
     pendingUploads: 0,
+    totalViews: 0,
+    favoriteCount: 0,
+    storageUsed: '0 GB',
+    thisMonthGalleries: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -83,6 +91,10 @@ export default function HomeScreen() {
         totalPhotos: 3456,
         activeClients: 18,
         pendingUploads: 2,
+        totalViews: 12847,
+        favoriteCount: 892,
+        storageUsed: '4.2 GB',
+        thisMonthGalleries: 7,
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -240,13 +252,53 @@ export default function HomeScreen() {
                     color="#F59E0B"
                   />
                   <StatCard
-                    icon="cloud-upload-outline"
-                    label="Pending"
-                    value={stats.pendingUploads}
-                    color="#EF4444"
+                    icon="eye-outline"
+                    label="Views"
+                    value={stats.totalViews.toLocaleString()}
+                    color="#8B5CF6"
+                  />
+                  <StatCard
+                    icon="heart-outline"
+                    label="Favorites"
+                    value={stats.favoriteCount.toLocaleString()}
+                    color="#EC4899"
+                  />
+                  <StatCard
+                    icon="cloud-outline"
+                    label="Storage"
+                    value={stats.storageUsed}
+                    color="#06B6D4"
                   />
                 </View>
               </Animated.View>
+
+              {/* This Month */}
+              {user?.role === 'studio' && (
+                <Animated.View entering={FadeInDown.delay(250)}>
+                  <Text style={styles.sectionTitle}>This Month</Text>
+                  <View style={styles.monthCard}>
+                    <View style={styles.monthStat}>
+                      <View style={styles.monthIconContainer}>
+                        <Ionicons name="add-circle" size={24} color="#10B981" />
+                      </View>
+                      <View style={styles.monthInfo}>
+                        <Text style={styles.monthValue}>{stats.thisMonthGalleries}</Text>
+                        <Text style={styles.monthLabel}>New Galleries</Text>
+                      </View>
+                    </View>
+                    
+                    <View style={styles.monthStat}>
+                      <View style={styles.monthIconContainer}>
+                        <Ionicons name="trending-up" size={24} color="#667EEA" />
+                      </View>
+                      <View style={styles.monthInfo}>
+                        <Text style={styles.monthValue}>+23%</Text>
+                        <Text style={styles.monthLabel}>Growth</Text>
+                      </View>
+                    </View>
+                  </View>
+                </Animated.View>
+              )}
 
               {/* Recent Galleries */}
               <Animated.View entering={FadeInDown.delay(300)}>
@@ -482,5 +534,45 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: 'rgba(255,255,255,0.8)',
     flex: 1,
+  },
+  monthCard: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 24,
+    gap: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  monthStat: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  monthIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  monthInfo: {
+    flex: 1,
+  },
+  monthValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  monthLabel: {
+    fontSize: 13,
+    color: '#6B7280',
   },
 });

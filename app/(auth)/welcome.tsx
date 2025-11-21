@@ -165,7 +165,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    backdropFilter: 'blur(10px)',
   },
   logoEmoji: {
     fontSize: 60,
@@ -193,7 +192,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backdropFilter: 'blur(10px)',
   },
   featureText: {
     color: 'white',
@@ -225,7 +223,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.5)',
-    backdropFilter: 'blur(10px)',
   },
   secondaryButtonText: {
     color: 'white',
