@@ -59,7 +59,7 @@ export default function ProfileScreen() {
               <MenuItem 
                 icon="people-outline" 
                 title="Clients" 
-                onPress={() => router.push('/clients')}
+                onPress={() => router.push('/clients/index')}
               />
               <MenuItem icon="analytics-outline" title="Analytics" />
               <MenuItem icon="color-palette-outline" title="Branding" isLast />

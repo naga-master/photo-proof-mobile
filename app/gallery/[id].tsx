@@ -18,7 +18,11 @@ import Animated, { FadeIn, FadeInRight } from 'react-native-reanimated';
 import { projectService, Project } from '@/services/api/projects';
 import { photoService, Photo } from '@/services/api/photos';
 import Toast from 'react-native-toast-message';
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/utils/haptics';
+import { ErrorState } from '@/components/common/ErrorState';
+import { EmptyState } from '@/components/common/EmptyState';
+import { handleApiError, isNotFoundError } from '@/utils/apiErrors';
+import type { ErrorInfo } from '@/components/common/ErrorState';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const NUM_COLUMNS = 3;
@@ -31,6 +35,7 @@ export default function GalleryDetailScreen() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<ErrorInfo | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -41,6 +46,7 @@ export default function GalleryDetailScreen() {
   const fetchGalleryData = async () => {
     try {
       setLoading(true);
+      setError(null);
       
       // Fetch project details
       const projectData = await projectService.getProject(parseInt(id));
@@ -49,13 +55,19 @@ export default function GalleryDetailScreen() {
       // Fetch photos
       const photosData = await photoService.getProjectPhotos(parseInt(id));
       setPhotos(photosData);
-    } catch (error: any) {
-      console.error('Failed to fetch gallery:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to load gallery',
-      });
+    } catch (err: any) {
+      console.error('Failed to fetch gallery:', err);
+      const errorInfo = handleApiError(err);
+      setError(errorInfo);
+      
+      // Only show toast for non-404 errors (404 shows empty state)
+      if (!isNotFoundError(err)) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: errorInfo.message,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -68,13 +80,13 @@ export default function GalleryDetailScreen() {
   };
 
   const handlePhotoPress = (photo: Photo) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     // TODO: Navigate to photo viewer
     router.push(`/photo/${photo.id}`);
   };
 
   const handleBackPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     router.back();
   };
 
@@ -131,12 +143,57 @@ export default function GalleryDetailScreen() {
     </Animated.View>
   );
 
+  // Loading state
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#667EEA" />
         <Text style={styles.loadingText}>Loading gallery...</Text>
       </View>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable onPress={handleBackPress} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </Pressable>
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerTitle}>Error</Text>
+          </View>
+        </View>
+        <ErrorState 
+          error={error} 
+          onRetry={fetchGalleryData}
+          onDismiss={handleBackPress}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  // No gallery found
+  if (!project) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <Pressable onPress={handleBackPress} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </Pressable>
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerTitle}>Gallery Not Found</Text>
+          </View>
+        </View>
+        <EmptyState
+          icon="search-outline"
+          title="Gallery Not Found"
+          message="This gallery doesn't exist or has been removed."
+          actionLabel="Go Back"
+          onAction={handleBackPress}
+        />
+      </SafeAreaView>
     );
   }
 

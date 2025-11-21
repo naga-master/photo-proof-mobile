@@ -97,7 +97,19 @@ export default function RootLayout() {
                 }}
               />
               <Stack.Screen
-                name="clients"
+                name="clients/index"
+                options={{
+                  animation: 'slide_from_right',
+                }}
+              />
+              <Stack.Screen
+                name="clients/[id]"
+                options={{
+                  animation: 'slide_from_right',
+                }}
+              />
+              <Stack.Screen
+                name="clients/add"
                 options={{
                   animation: 'slide_from_right',
                 }}

@@ -18,7 +18,7 @@ import { clientService, Client } from '@/services/api/clients';
 import { projectService, Project } from '@/services/api/projects';
 import { Image } from 'expo-image';
 import Toast from 'react-native-toast-message';
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/utils/haptics';
 
 export default function ClientDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -57,28 +57,28 @@ export default function ClientDetailScreen() {
 
   const handleCall = () => {
     if (client?.phone) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      haptics.impact('medium');
       Linking.openURL(`tel:${client.phone}`);
     }
   };
 
   const handleEmail = () => {
     if (client?.email) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      haptics.impact('medium');
       Linking.openURL(`mailto:${client.email}`);
     }
   };
 
   const handleWhatsApp = () => {
     if (client?.phone) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      haptics.impact('medium');
       const phoneNumber = client.phone.replace(/[^\d]/g, '');
       Linking.openURL(`https://wa.me/${phoneNumber}`);
     }
   };
 
   const handleEditClient = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     router.push(`/clients/edit/${client?.id}`);
   };
 
@@ -113,7 +113,7 @@ export default function ClientDetailScreen() {
   };
 
   const handleProjectPress = (project: Project) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     router.push(`/gallery/${project.id}`);
   };
 

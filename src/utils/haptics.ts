@@ -8,6 +8,23 @@ import { Platform } from 'react-native';
 
 export const haptics = {
   /**
+   * Impact feedback with configurable intensity
+   */
+  impact: async (style: 'light' | 'medium' | 'heavy' = 'light') => {
+    if (Platform.OS === 'web') return;
+    try {
+      const styleMap = {
+        light: Haptics.ImpactFeedbackStyle.Light,
+        medium: Haptics.ImpactFeedbackStyle.Medium,
+        heavy: Haptics.ImpactFeedbackStyle.Heavy,
+      };
+      await Haptics.impactAsync(styleMap[style]);
+    } catch (error) {
+      // Silently fail on unsupported platforms
+    }
+  },
+
+  /**
    * Light impact feedback (for button presses, selections)
    */
   light: async () => {

@@ -23,7 +23,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { photoService, Photo } from '@/services/api/photos';
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/utils/haptics';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import Toast from 'react-native-toast-message';
@@ -66,7 +66,7 @@ export default function PhotoViewerScreen() {
   };
 
   const handleClose = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     router.back();
   };
 
@@ -122,7 +122,7 @@ export default function PhotoViewerScreen() {
   const handleToggleFavorite = async () => {
     if (!photo) return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.impact('medium');
     try {
       await photoService.toggleFavorite(photo.id);
       setIsFavorite(!isFavorite);
@@ -142,7 +142,7 @@ export default function PhotoViewerScreen() {
   const handleDownload = async () => {
     if (!photo) return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptics.impact('medium');
     
     try {
       // Request permission
@@ -180,7 +180,7 @@ export default function PhotoViewerScreen() {
   const handleShare = async () => {
     if (!photo) return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     
     try {
       const photoUrl = photoService.getPhotoUrl(photo.id, 'large');

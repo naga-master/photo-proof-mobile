@@ -16,7 +16,7 @@ import { router } from 'expo-router';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { clientService, Client } from '@/services/api/clients';
 import Toast from 'react-native-toast-message';
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/utils/haptics';
 
 export default function ClientsScreen() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -67,12 +67,12 @@ export default function ClientsScreen() {
   };
 
   const handleClientPress = (client: Client) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     router.push(`/clients/${client.id}`);
   };
 
   const handleAddClient = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.impact('light');
     router.push('/clients/add');
   };
 
