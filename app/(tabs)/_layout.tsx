@@ -160,14 +160,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activity"
         options={{
-          title: 'Activity',
+          title: 'Contracts',
           tabBarIcon: ({ color, size, focused }) => (
             <View style={{
               alignItems: 'center',
               justifyContent: 'center',
             }}>
               <Ionicons 
-                name={focused ? "notifications" : "notifications-outline"} 
+                name={focused ? "document-text" : "document-text-outline"} 
                 size={size} 
                 color={color} 
               />
@@ -181,16 +181,6 @@ export default function TabLayout() {
                   backgroundColor: '#667EEA',
                 }} />
               )}
-              {/* Notification Badge */}
-              <View style={{
-                position: 'absolute',
-                top: -2,
-                right: -6,
-                width: 8,
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: '#EF4444',
-              }} />
             </View>
           ),
         }}

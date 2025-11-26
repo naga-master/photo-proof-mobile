@@ -179,7 +179,7 @@ export default function HomeScreen() {
             <Text style={styles.userName}>{user?.name || 'User'} 👋</Text>
           </View>
           <Pressable
-            onPress={() => router.push('/notifications')}
+            onPress={() => router.push('/notifications' as any)}
             style={styles.notificationButton}
           >
             <Ionicons name="notifications-outline" size={24} color="#374151" />
@@ -225,6 +225,18 @@ export default function HomeScreen() {
                   >
                     <Ionicons name="folder-open-outline" size={28} color="#667EEA" />
                     <Text style={styles.quickActionText}>Browse</Text>
+                  </Pressable>
+                  
+                  <Pressable
+                    onPress={() => router.push('/contracts' as any)}
+                    style={({ pressed }) => [
+                      styles.quickActionButton,
+                      styles.secondaryAction,
+                      pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <Ionicons name="document-text-outline" size={28} color="#667EEA" />
+                    <Text style={styles.quickActionText}>Contracts</Text>
                   </Pressable>
                 </View>
               </Animated.View>
@@ -382,11 +394,13 @@ const styles = StyleSheet.create({
   },
   quickActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
     paddingHorizontal: 24,
     paddingTop: 24,
   },
   quickActionButton: {
+    minWidth: '30%',
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
