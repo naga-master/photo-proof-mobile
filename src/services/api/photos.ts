@@ -18,6 +18,10 @@ export interface Photo {
   is_selected: boolean;
   created_at: string;
   updated_at: string;
+  status?: 'pending' | 'uploading' | 'processing' | 'completed' | 'failed';
+  processing_error?: string;
+  processing_attempts?: number;
+  last_processing_attempt_at?: string;
 }
 
 export interface PhotoUploadProgress {
@@ -186,5 +190,23 @@ export const photoService = {
     }
     
     throw new Error('Download failed');
+  },
+
+  /**
+   * Get photos with processing issues for current user
+   */
+  async getProcessingIssues(): Promise<{
+    total_failed: number;
+    photos: Array<{
+      id: number;
+      project_id: number;
+      filename: string;
+      error: string;
+      uploaded_at: string;
+      last_attempt: string;
+      attempts: number;
+    }>;
+  }> {
+    return apiClient.get('/v2/photos/processing-issues');
   },
 };

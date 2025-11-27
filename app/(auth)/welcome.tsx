@@ -41,7 +41,7 @@ export default function WelcomeScreen() {
     <>
       <StatusBar style="light" />
       <LinearGradient
-        colors={['#667EEA', '#764BA2', '#F093FB']}
+        colors={['#6B7C4A', '#8A9D6B', '#FFD9C0']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.container}
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   primaryButtonText: {
-    color: '#667EEA',
+    color: '#6B7C4A',
     fontSize: 17,
     fontWeight: '600',
     textAlign: 'center',

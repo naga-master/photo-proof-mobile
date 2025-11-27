@@ -196,7 +196,7 @@ export default function HomeScreen() {
         >
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#667EEA" />
+              <ActivityIndicator size="large" color="#6B7C4A" />
             </View>
           ) : (
             <>
@@ -249,37 +249,37 @@ export default function HomeScreen() {
                     icon="albums-outline"
                     label="Galleries"
                     value={stats.totalGalleries}
-                    color="#667EEA"
+                    color="#6B7C4A"
                   />
                   <StatCard
                     icon="images-outline"
                     label="Photos"
                     value={stats.totalPhotos.toLocaleString()}
-                    color="#10B981"
+                    color="#8A9D6B"
                   />
                   <StatCard
                     icon="people-outline"
                     label="Clients"
                     value={stats.activeClients}
-                    color="#F59E0B"
+                    color="#FF8C42"
                   />
                   <StatCard
                     icon="eye-outline"
                     label="Views"
                     value={stats.totalViews.toLocaleString()}
-                    color="#8B5CF6"
+                    color="#D4A574"
                   />
                   <StatCard
                     icon="heart-outline"
                     label="Favorites"
                     value={stats.favoriteCount.toLocaleString()}
-                    color="#EC4899"
+                    color="#F4A259"
                   />
                   <StatCard
                     icon="cloud-outline"
                     label="Storage"
                     value={stats.storageUsed}
-                    color="#06B6D4"
+                    color="#6B9C4A"
                   />
                 </View>
               </Animated.View>
@@ -291,7 +291,7 @@ export default function HomeScreen() {
                   <View style={styles.monthCard}>
                     <View style={styles.monthStat}>
                       <View style={styles.monthIconContainer}>
-                        <Ionicons name="add-circle" size={24} color="#10B981" />
+                        <Ionicons name="add-circle" size={24} color="#6B9C4A" />
                       </View>
                       <View style={styles.monthInfo}>
                         <Text style={styles.monthValue}>{stats.thisMonthGalleries}</Text>
@@ -301,7 +301,7 @@ export default function HomeScreen() {
                     
                     <View style={styles.monthStat}>
                       <View style={styles.monthIconContainer}>
-                        <Ionicons name="trending-up" size={24} color="#667EEA" />
+                        <Ionicons name="trending-up" size={24} color="#6B7C4A" />
                       </View>
                       <View style={styles.monthInfo}>
                         <Text style={styles.monthValue}>+23%</Text>
@@ -342,7 +342,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFF5E8',
   },
   header: {
     flexDirection: 'row',
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#6B7C4A',
   },
   userName: {
     fontSize: 24,
@@ -410,8 +410,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   primaryAction: {
-    backgroundColor: '#667EEA',
-    shadowColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
+    shadowColor: '#6B7C4A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -420,12 +420,12 @@ const styles = StyleSheet.create({
   secondaryAction: {
     backgroundColor: 'white',
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
+    borderColor: '#6B7C4A',
   },
   quickActionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#667EEA',
+    color: '#6B7C4A',
   },
   quickActionTextPrimary: {
     fontSize: 16,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 14,
-    color: '#667EEA',
+    color: '#6B7C4A',
     fontWeight: '600',
   },
   statsGrid: {
@@ -465,8 +465,8 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: (SCREEN_WIDTH - 48 - 12) / 2,
-    padding: 16,
-    borderRadius: 16,
+    padding: 20,
+    borderRadius: 20,
     height: 100,
   },
   statIconContainer: {

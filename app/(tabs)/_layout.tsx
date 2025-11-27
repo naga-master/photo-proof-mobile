@@ -9,14 +9,14 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#667EEA',
+        tabBarActiveTintColor: '#6B7C4A',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : '#FFFFFF',
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : '#FFF5E8',
           borderTopWidth: 0,
           elevation: 0,
           height: Platform.OS === 'ios' ? 88 : 68,
@@ -44,7 +44,7 @@ export default function TabLayout() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#FFF5E8',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: -2 },
                 shadowOpacity: 0.05,
@@ -90,7 +90,7 @@ export default function TabLayout() {
                   width: 5,
                   height: 5,
                   borderRadius: 2.5,
-                  backgroundColor: '#667EEA',
+                  backgroundColor: '#6B7C4A',
                 }} />
               )}
             </View>
@@ -119,7 +119,7 @@ export default function TabLayout() {
                   width: 5,
                   height: 5,
                   borderRadius: 2.5,
-                  backgroundColor: '#667EEA',
+                  backgroundColor: '#6B7C4A',
                 }} />
               )}
             </View>
@@ -136,11 +136,11 @@ export default function TabLayout() {
               width: 56,
               height: 56,
               borderRadius: 28,
-              backgroundColor: focused ? '#667EEA' : '#F3F4F6',
+              backgroundColor: focused ? '#6B7C4A' : '#F3F4F6',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: 16,
-              shadowColor: focused ? '#667EEA' : '#000',
+              shadowColor: focused ? '#6B7C4A' : '#000',
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: focused ? 0.3 : 0.1,
               shadowRadius: 8,
@@ -178,7 +178,7 @@ export default function TabLayout() {
                   width: 5,
                   height: 5,
                   borderRadius: 2.5,
-                  backgroundColor: '#667EEA',
+                  backgroundColor: '#6B7C4A',
                 }} />
               )}
             </View>
@@ -207,7 +207,7 @@ export default function TabLayout() {
                   width: 5,
                   height: 5,
                   borderRadius: 2.5,
-                  backgroundColor: '#667EEA',
+                  backgroundColor: '#6B7C4A',
                 }} />
               )}
             </View>

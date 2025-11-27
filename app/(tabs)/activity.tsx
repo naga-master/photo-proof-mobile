@@ -62,7 +62,7 @@ export default function ContractsScreen() {
       case 'draft': return '#6B7280';
       case 'sent':
       case 'viewed': return '#F59E0B';
-      case 'signed': return '#10B981';
+      case 'signed': return '#6B9C4A';
       case 'expired':
       case 'cancelled': return '#EF4444';
       default: return '#6B7280';
@@ -122,7 +122,7 @@ export default function ContractsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#667EEA" />
+        <ActivityIndicator size="large" color="#6B7C4A" />
       </SafeAreaView>
     );
   }
@@ -150,10 +150,10 @@ export default function ContractsScreen() {
             style={styles.statsScroll}
             contentContainerStyle={styles.statsContent}
           >
-            <StatCard icon="document-text-outline" label="Total" value={stats.total} color="#667EEA" />
+            <StatCard icon="document-text-outline" label="Total" value={stats.total} color="#6B7C4A" />
             <StatCard icon="create-outline" label="Draft" value={stats.draft} color="#6B7280" />
             <StatCard icon="time-outline" label="Pending" value={stats.pending} color="#F59E0B" />
-            <StatCard icon="checkmark-circle-outline" label="Signed" value={stats.signed} color="#10B981" />
+            <StatCard icon="checkmark-circle-outline" label="Signed" value={stats.signed} color="#6B9C4A" />
             <StatCard icon="warning-outline" label="Expiring" value={stats.expiring} color="#EF4444" />
           </ScrollView>
         )}
@@ -179,7 +179,7 @@ export default function ContractsScreen() {
       {/* Contract List */}
       <ScrollView
         style={styles.contractList}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#667EEA']} tintColor="#667EEA" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6B7C4A']} tintColor="#6B7C4A" />}
       >
         {contracts.length > 0 ? (
           contracts.map((contract) => <ContractItem key={contract.id} contract={contract} />)
@@ -198,12 +198,12 @@ export default function ContractsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F9FAFB' },
+  container: { flex: 1, backgroundColor: '#FFF5E8' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF5E8' },
   header: { backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   headerTitle: { fontSize: 28, fontWeight: 'bold', color: '#1F2937' },
-  newButton: { backgroundColor: '#667EEA', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 4 },
+  newButton: { backgroundColor: '#6B7C4A', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 4 },
   newButtonText: { color: 'white', fontWeight: '600' },
   statsScroll: { marginHorizontal: -16, paddingHorizontal: 12 },
   statsContent: { paddingVertical: 8, gap: 8 },
@@ -213,8 +213,8 @@ const styles = StyleSheet.create({
   statValue: { fontSize: 24, fontWeight: 'bold', color: '#1F2937' },
   filterScroll: { paddingVertical: 12, maxHeight: 60 },
   filterContent: { flexDirection: 'row', paddingHorizontal: 16, gap: 8 },
-  filterPill: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: '#E5E7EB', borderRadius: 20 },
-  filterPillActive: { backgroundColor: '#667EEA' },
+  filterPill: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: '#E8D5C4', borderRadius: 20 },
+  filterPillActive: { backgroundColor: '#6B7C4A' },
   filterText: { color: '#6B7280', fontWeight: '600' },
   filterTextActive: { color: 'white' },
   contractList: { flex: 1, paddingHorizontal: 16 },

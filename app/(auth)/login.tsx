@@ -211,7 +211,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF5E8',
   },
   keyboardView: {
     flex: 1,
@@ -250,9 +250,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 32,
   },
   toggleLabel: {
@@ -275,12 +275,12 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     paddingHorizontal: 16,
     height: 56,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#E8D5C4',
   },
   inputIcon: {
     marginRight: 12,
@@ -299,15 +299,15 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: '#667EEA',
+    color: '#FF8C42',
     fontWeight: '500',
   },
   loginButton: {
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     paddingVertical: 18,
     borderRadius: 30,
     alignItems: 'center',
-    shadowColor: '#667EEA',
+    shadowColor: '#6B7C4A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   signUpLink: {
     fontSize: 14,
-    color: '#667EEA',
+    color: '#6B7C4A',
     fontWeight: '600',
   },
 });

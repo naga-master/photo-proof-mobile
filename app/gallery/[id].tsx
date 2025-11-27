@@ -36,12 +36,33 @@ export default function GalleryDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<ErrorInfo | null>(null);
+  const [galleryProcessingIssues, setGalleryProcessingIssues] = useState(0);
 
   useEffect(() => {
     if (id) {
       fetchGalleryData();
     }
   }, [id]);
+
+  // Count processing issues in this gallery
+  useEffect(() => {
+    if (photos) {
+      const issues = photos.filter(p => p.processing_error).length;
+      setGalleryProcessingIssues(issues);
+    }
+  }, [photos]);
+
+  // Auto-refresh when photos are processing
+  useEffect(() => {
+    const hasProcessing = photos.some(p => p.status === 'processing');
+    
+    if (hasProcessing) {
+      const interval = setInterval(() => {
+        fetchGalleryData(); // Refresh silently
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [photos]);
 
   const fetchGalleryData = async () => {
     try {
@@ -220,6 +241,22 @@ export default function GalleryDetailScreen() {
             <Ionicons name="ellipsis-horizontal" size={24} color="white" />
           </Pressable>
         </View>
+
+        {/* Processing Issues Banner */}
+        {galleryProcessingIssues > 0 && (
+          <Pressable 
+            style={styles.processingBanner}
+            onPress={() => {
+              router.push('/(tabs)/activity');
+            }}
+          >
+            <Ionicons name="warning" size={20} color="#EF4444" />
+            <Text style={styles.bannerText}>
+              {galleryProcessingIssues} photo{galleryProcessingIssues > 1 ? 's' : ''} failed processing
+            </Text>
+            <Text style={styles.bannerAction}>View Details →</Text>
+          </Pressable>
+        )}
 
         {/* Photo Grid */}
         {photos.length === 0 ? (
@@ -411,5 +448,28 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginTop: 4,
     fontWeight: '500',
+  },
+  processingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    borderLeftWidth: 4,
+    borderLeftColor: '#EF4444',
+    padding: 12,
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  bannerText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#991B1B',
+    fontWeight: '500',
+  },
+  bannerAction: {
+    fontSize: 14,
+    color: '#EF4444',
+    fontWeight: '600',
   },
 });

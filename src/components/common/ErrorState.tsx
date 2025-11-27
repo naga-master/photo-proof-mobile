@@ -35,13 +35,13 @@ export function ErrorState({ error, onRetry, onDismiss, style }: ErrorStateProps
   const getColor = () => {
     switch (error.type) {
       case 'network':
-        return '#F59E0B';
+        return '#FF8C42';
       case 'not_found':
         return '#6B7280';
       case 'unauthorized':
-        return '#EF4444';
+        return '#D85B4C';
       case 'server':
-        return '#F59E0B';
+        return '#FF8C42';
       default:
         return '#6B7280';
     }
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF5E8',
   },
   iconContainer: {
     width: 96,
@@ -148,17 +148,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
     gap: 8,
     minWidth: 120,
   },
   retryButton: {
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
   },
   dismissButton: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#E8D5C4',
   },
   buttonPressed: {
     opacity: 0.7,

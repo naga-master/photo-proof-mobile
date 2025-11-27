@@ -26,7 +26,7 @@ export function EmptyState({
       style={[styles.container, style]}
     >
       <View style={styles.iconContainer}>
-        <Ionicons name={icon} size={64} color="#D1D5DB" />
+        <Ionicons name={icon} size={64} color="#D4A574" />
       </View>
       
       <Text style={styles.title}>{title}</Text>
@@ -54,16 +54,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF5E8',
   },
   iconContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   title: {
     fontSize: 20,
@@ -84,10 +89,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     paddingVertical: 14,
     paddingHorizontal: 28,
-    borderRadius: 12,
+    borderRadius: 16,
     gap: 8,
   },
   buttonPressed: {

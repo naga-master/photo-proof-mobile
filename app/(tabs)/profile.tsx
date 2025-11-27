@@ -19,7 +19,7 @@ export default function ProfileScreen() {
       onPress={onPress}
     >
       <View style={styles.menuItemLeft}>
-        <Ionicons name={icon} size={24} color="#667EEA" />
+        <Ionicons name={icon} size={24} color="#6B7C4A" />
         <Text style={styles.menuItemText}>{title}</Text>
       </View>
       <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
@@ -101,14 +101,14 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFF5E8',
   },
   header: {
     backgroundColor: 'white',
     paddingVertical: 32,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#E8D5C4',
   },
   profileInfo: {
     alignItems: 'center',
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#E8D5C4',
   },
   menuItemLast: {
     borderBottomWidth: 0,

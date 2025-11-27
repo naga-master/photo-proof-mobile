@@ -75,7 +75,7 @@ export default function ForgotPasswordScreen() {
             {/* Icon */}
             <View style={styles.iconContainer}>
               <View style={styles.iconCircle}>
-                <Ionicons name="lock-closed-outline" size={48} color="#667EEA" />
+                <Ionicons name="lock-closed-outline" size={48} color="#6B7C4A" />
               </View>
             </View>
 
@@ -126,7 +126,7 @@ export default function ForgotPasswordScreen() {
 
             {/* Back to Login */}
             <View style={styles.backToLoginContainer}>
-              <Ionicons name="arrow-back" size={16} color="#667EEA" />
+              <Ionicons name="arrow-back" size={16} color="#6B7C4A" />
               <Pressable onPress={() => router.back()}>
                 <Text style={styles.backToLoginText}>Back to Sign In</Text>
               </Pressable>
@@ -205,12 +205,12 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     paddingHorizontal: 16,
     height: 56,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#E8D5C4',
   },
   inputIcon: {
     marginRight: 12,
@@ -221,11 +221,11 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   resetButton: {
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     paddingVertical: 18,
     borderRadius: 30,
     alignItems: 'center',
-    shadowColor: '#667EEA',
+    shadowColor: '#6B7C4A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   },
   backToLoginText: {
     fontSize: 14,
-    color: '#667EEA',
+    color: '#6B7C4A',
     fontWeight: '600',
   },
 });

@@ -241,7 +241,7 @@ export default function CreateScreen() {
             </View>
 
             <View style={styles.photosSummary}>
-              <Ionicons name="images" size={24} color="#667EEA" />
+              <Ionicons name="images" size={24} color="#6B7C4A" />
               <Text style={styles.photosSummaryText}>
                 {selectedPhotos.length} {selectedPhotos.length === 1 ? 'photo' : 'photos'} selected
               </Text>
@@ -278,7 +278,7 @@ export default function CreateScreen() {
           <View style={styles.emptyContainer}>
             <Animated.View entering={FadeIn} style={styles.emptyContent}>
               <View style={styles.iconContainer}>
-                <Ionicons name="cloud-upload-outline" size={64} color="#667EEA" />
+                <Ionicons name="cloud-upload-outline" size={64} color="#6B7C4A" />
               </View>
               <Text style={styles.emptyTitle}>Upload Photos</Text>
               <Text style={styles.emptySubtitle}>
@@ -312,7 +312,7 @@ export default function CreateScreen() {
               contentContainerStyle={styles.gridContent}
               ListHeaderComponent={
                 <Pressable onPress={pickPhotos} style={styles.addMoreButton}>
-                  <Ionicons name="add" size={32} color="#667EEA" />
+                  <Ionicons name="add" size={32} color="#6B7C4A" />
                   <Text style={styles.addMoreText}>Add More</Text>
                 </Pressable>
               }
@@ -327,7 +327,7 @@ export default function CreateScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFF5E8',
   },
   header: {
     flexDirection: 'row',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#E8D5C4',
   },
   backButton: {
     width: 40,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -400,11 +400,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     paddingHorizontal: 32,
     paddingVertical: 16,
     borderRadius: 30,
-    shadowColor: '#667EEA',
+    shadowColor: '#6B7C4A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
   addMoreText: {
     fontSize: 12,
-    color: '#667EEA',
+    color: '#6B7C4A',
     fontWeight: '500',
     marginTop: 4,
   },
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#E8D5C4',
     color: '#111827',
   },
   photosSummary: {
@@ -489,17 +489,17 @@ const styles = StyleSheet.create({
   photosSummaryText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#667EEA',
+    color: '#6B7C4A',
   },
   uploadButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     paddingVertical: 16,
     borderRadius: 30,
-    shadowColor: '#667EEA',
+    shadowColor: '#6B7C4A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#667EEA',
+    color: '#6B7C4A',
   },
   uploadingTitle: {
     fontSize: 24,
@@ -547,13 +547,13 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     width: 300,
     height: 8,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#E8D5C4',
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     borderRadius: 4,
   },
 });

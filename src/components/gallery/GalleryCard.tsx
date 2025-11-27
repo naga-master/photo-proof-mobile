@@ -110,9 +110,9 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     height: 240,
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#667EEA',
+    color: '#6B7C4A',
   },
   statusBadge: {
     position: 'absolute',
@@ -191,10 +191,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   statusActive: {
-    backgroundColor: 'rgba(16, 185, 129, 0.9)',
+    backgroundColor: 'rgba(107, 156, 74, 0.9)',
   },
   statusDraft: {
-    backgroundColor: 'rgba(249, 115, 22, 0.9)',
+    backgroundColor: 'rgba(255, 140, 66, 0.9)',
   },
   statusText: {
     fontSize: 11,

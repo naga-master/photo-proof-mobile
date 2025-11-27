@@ -127,7 +127,7 @@ export default function GalleryScreen() {
         {/* Gallery List */}
         {loading && !refreshing ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#667EEA" />
+            <ActivityIndicator size="large" color="#6B7C4A" />
           </View>
         ) : projects.length === 0 ? (
           <EmptyState />
@@ -157,7 +157,7 @@ export default function GalleryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFF5E8',
   },
   header: {
     flexDirection: 'row',
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#E8D5C4',
   },
   title: {
     fontSize: 28,
@@ -193,13 +193,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#E8D5C4',
   },
   filterButtonActive: {
-    backgroundColor: '#667EEA',
-    borderColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
+    borderColor: '#6B7C4A',
   },
   filterButtonText: {
     fontSize: 14,
@@ -249,11 +249,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#667EEA',
+    backgroundColor: '#6B7C4A',
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 30,
-    shadowColor: '#667EEA',
+    shadowColor: '#6B7C4A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
