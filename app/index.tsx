@@ -1,35 +1,44 @@
-import { useEffect, useState } from 'react';
-import { router, useRootNavigationState } from 'expo-router';
+/**
+ * Index Page - Entry point redirect
+ * Redirects users based on authentication state
+ */
+
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { Redirect, Href } from 'expo-router';
+
 import { useAuthStore } from '@/stores/authStore';
-import { View, ActivityIndicator } from 'react-native';
+import { colors } from '@/theme';
 
 export default function Index() {
-  const { isAuthenticated, isLoading } = useAuthStore();
-  const rootNavigationState = useRootNavigationState();
-  const [hasNavigated, setHasNavigated] = useState(false);
+  const { isAuthenticated, isInitialized, user } = useAuthStore();
 
-  useEffect(() => {
-    // Wait for root navigation to be ready
-    if (!rootNavigationState?.key || isLoading || hasNavigated) {
-      return;
-    }
+  // Show loading while initializing
+  if (!isInitialized) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={colors.primary[600]} />
+      </View>
+    );
+  }
 
-    // Navigate once ready
-    const timeout = setTimeout(() => {
-      if (isAuthenticated) {
-        router.replace('/(tabs)');
-      } else {
-        router.replace('/(auth)/welcome');
-      }
-      setHasNavigated(true);
-    }, 100);
+  // Redirect based on auth state
+  if (!isAuthenticated) {
+    return <Redirect href={'/(auth)/login' as Href} />;
+  }
 
-    return () => clearTimeout(timeout);
-  }, [rootNavigationState?.key, isAuthenticated, isLoading, hasNavigated]);
+  // Redirect based on user role
+  if (user?.role?.startsWith('studio')) {
+    return <Redirect href={'/(studio)/dashboard' as Href} />;
+  }
 
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F9FAFB' }}>
-      <ActivityIndicator size="large" color="#667EEA" />
-    </View>
-  );
+  return <Redirect href={'/(client)/albums' as Href} />;
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+  },
+});

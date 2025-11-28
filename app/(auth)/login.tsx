@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+/**
+ * Login Screen
+ * Supports studio and client login with biometrics
+ */
+
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,81 +15,112 @@ import {
   ScrollView,
   ActivityIndicator,
   Switch,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import { Link, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { useAuthStore } from '@/stores/authStore';
-import { haptics } from '@/utils/haptics';
+
+import { useAuthStore, useBiometrics } from '@/stores/authStore';
+import { useTheme } from '@/theme/ThemeProvider';
+import { colors, spacing, borderRadius, typography, shadows } from '@/theme';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const { theme, isDark } = useTheme();
+  const {
+    studioLogin,
+    clientLogin,
+    isLoading,
+    error,
+    clearError,
+  } = useAuthStore();
+  const { available: biometricsAvailable, enabled: biometricsEnabled, login: loginWithBiometrics } = useBiometrics();
+
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isStudioLogin, setIsStudioLogin] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const { login } = useAuthStore();
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Clear error when inputs change
+  useEffect(() => {
+    if (error) {
+      clearError();
+    }
+  }, [username, password, isStudioLogin]);
+
+  // Try biometric login on mount if enabled
+  useEffect(() => {
+    if (biometricsEnabled) {
+      handleBiometricLogin();
+    }
+  }, [biometricsEnabled]);
 
   const handleLogin = async () => {
-    // Validate inputs
-    if (!email || !password) {
+    if (!username.trim() || !password.trim()) {
       Toast.show({
         type: 'error',
         text1: 'Missing Information',
-        text2: 'Please enter your email and password',
+        text2: 'Please enter your username and password',
       });
-      haptics.error();
       return;
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Toast.show({
-        type: 'error',
-        text1: 'Invalid Email',
-        text2: 'Please enter a valid email address',
-      });
-      haptics.error();
-      return;
-    }
-
-    setIsLoading(true);
-    
     try {
-      await login(email, password, isStudioLogin);
-      
-      // Success haptic feedback
-      haptics.success();
-      
+      const credentials = {
+        username: username.trim(),
+        password: password,
+      };
+
+      if (isStudioLogin) {
+        await studioLogin(credentials);
+      } else {
+        await clientLogin(credentials);
+      }
+
       Toast.show({
         type: 'success',
         text1: 'Welcome Back!',
         text2: 'Login successful',
       });
-      
-      // Navigate to main app
-      router.replace('/(tabs)');
-    } catch (error: any) {
-      haptics.error();
-      
+
+      // Navigation is handled by NavigationGuard in _layout.tsx
+    } catch (err: any) {
       Toast.show({
         type: 'error',
         text1: 'Login Failed',
-        text2: error.response?.data?.detail || 'Invalid email or password',
+        text2: err.detail || 'Invalid username or password',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  const handleBiometricLogin = async () => {
+    try {
+      await loginWithBiometrics();
+      Toast.show({
+        type: 'success',
+        text1: 'Welcome Back!',
+        text2: 'Biometric login successful',
+      });
+    } catch (err: any) {
+      if (err.message !== 'Biometric authentication failed') {
+        Toast.show({
+          type: 'info',
+          text1: 'Session Expired',
+          text2: 'Please login with your credentials',
+        });
+      }
+    }
+  };
+
+  const styles = createStyles(theme, isDark);
+
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -95,47 +131,55 @@ export default function LoginScreen() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Back Button */}
-            <Animated.View entering={FadeIn} style={styles.header}>
-              <Pressable
-                onPress={() => router.back()}
-                style={styles.backButton}
-              >
-                <Ionicons name="arrow-back" size={24} color="#000" />
-              </Pressable>
+            {/* Logo / Header */}
+            <Animated.View entering={FadeIn.duration(600)} style={styles.headerSection}>
+              <View style={styles.logoContainer}>
+                <Ionicons
+                  name="camera"
+                  size={64}
+                  color={theme.colors.primary}
+                />
+              </View>
+              <Text style={styles.appName}>Photo Proof</Text>
+              <Text style={styles.tagline}>Professional Photo Management</Text>
             </Animated.View>
 
             {/* Title Section */}
-            <Animated.View entering={FadeInDown.delay(100)} style={styles.titleSection}>
+            <Animated.View entering={FadeInDown.delay(200)} style={styles.titleSection}>
               <Text style={styles.title}>Welcome back</Text>
               <Text style={styles.subtitle}>Sign in to your account</Text>
             </Animated.View>
 
             {/* Login Type Toggle */}
-            <Animated.View entering={FadeInDown.delay(200)} style={styles.toggleContainer}>
+            <Animated.View entering={FadeInDown.delay(300)} style={styles.toggleContainer}>
               <Text style={styles.toggleLabel}>Login as Studio</Text>
               <Switch
                 value={isStudioLogin}
                 onValueChange={setIsStudioLogin}
-                trackColor={{ false: '#E5E7EB', true: '#667EEA' }}
-                thumbColor={isStudioLogin ? '#fff' : '#f4f3f4'}
-                ios_backgroundColor="#E5E7EB"
+                trackColor={{ false: colors.neutral[300], true: theme.colors.primary }}
+                thumbColor={colors.white}
+                ios_backgroundColor={colors.neutral[300]}
               />
             </Animated.View>
 
             {/* Form Section */}
-            <Animated.View entering={FadeInDown.delay(300)} style={styles.form}>
+            <Animated.View entering={FadeInDown.delay(400)} style={styles.form}>
+              {/* Username Input */}
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Email</Text>
+                <Text style={styles.inputLabel}>Username</Text>
                 <View style={styles.inputWrapper}>
-                  <Ionicons name="mail-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                  <Ionicons
+                    name="person-outline"
+                    size={20}
+                    color={colors.neutral[400]}
+                    style={styles.inputIcon}
+                  />
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter your email"
-                    placeholderTextColor="#9CA3AF"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
+                    placeholder="Enter your username"
+                    placeholderTextColor={colors.neutral[400]}
+                    value={username}
+                    onChangeText={setUsername}
                     autoCapitalize="none"
                     autoCorrect={false}
                     editable={!isLoading}
@@ -143,14 +187,20 @@ export default function LoginScreen() {
                 </View>
               </View>
 
+              {/* Password Input */}
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
-                  <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color={colors.neutral[400]}
+                    style={styles.inputIcon}
+                  />
                   <TextInput
                     style={styles.input}
                     placeholder="Enter your password"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.neutral[400]}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
@@ -161,22 +211,37 @@ export default function LoginScreen() {
                     onPress={() => setShowPassword(!showPassword)}
                     style={styles.eyeButton}
                   >
-                    <Ionicons 
-                      name={showPassword ? "eye-outline" : "eye-off-outline"} 
-                      size={20} 
-                      color="#9CA3AF" 
+                    <Ionicons
+                      name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                      size={20}
+                      color={colors.neutral[400]}
                     />
                   </Pressable>
                 </View>
               </View>
 
-              <Pressable
-                onPress={() => router.push('/forgot-password')}
-                style={styles.forgotPassword}
-              >
-                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-              </Pressable>
+              {/* Remember Me & Forgot Password */}
+              <View style={styles.optionsRow}>
+                <Pressable
+                  style={styles.rememberMe}
+                  onPress={() => setRememberMe(!rememberMe)}
+                >
+                  <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                    {rememberMe && (
+                      <Ionicons name="checkmark" size={14} color={colors.white} />
+                    )}
+                  </View>
+                  <Text style={styles.rememberMeText}>Remember me</Text>
+                </Pressable>
 
+                <Link href="/(auth)/forgot-password" asChild>
+                  <Pressable>
+                    <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                  </Pressable>
+                </Link>
+              </View>
+
+              {/* Login Button */}
               <Pressable
                 onPress={handleLogin}
                 disabled={isLoading}
@@ -187,19 +252,42 @@ export default function LoginScreen() {
                 ]}
               >
                 {isLoading ? (
-                  <ActivityIndicator color="white" />
+                  <ActivityIndicator color={colors.white} />
                 ) : (
                   <Text style={styles.loginButtonText}>Sign In</Text>
                 )}
               </Pressable>
+
+              {/* Biometric Login */}
+              {biometricsAvailable && (
+                <Pressable
+                  onPress={handleBiometricLogin}
+                  disabled={isLoading}
+                  style={({ pressed }) => [
+                    styles.biometricButton,
+                    pressed && styles.buttonPressed,
+                  ]}
+                >
+                  <Ionicons
+                    name={Platform.OS === 'ios' ? 'finger-print' : 'finger-print'}
+                    size={24}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={styles.biometricButtonText}>
+                    Sign in with {Platform.OS === 'ios' ? 'Face ID / Touch ID' : 'Biometrics'}
+                  </Text>
+                </Pressable>
+              )}
             </Animated.View>
 
             {/* Sign Up Link */}
-            <Animated.View entering={FadeInDown.delay(400)} style={styles.signUpContainer}>
+            <Animated.View entering={FadeInDown.delay(500)} style={styles.signUpContainer}>
               <Text style={styles.signUpText}>Don't have an account? </Text>
-              <Pressable onPress={() => router.push('/register')}>
-                <Text style={styles.signUpLink}>Sign Up</Text>
-              </Pressable>
+              <Link href="/(auth)/register" asChild>
+                <Pressable>
+                  <Text style={styles.signUpLink}>Sign Up</Text>
+                </Pressable>
+              </Link>
             </Animated.View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -208,136 +296,186 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFF5E8',
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-  },
-  header: {
-    paddingVertical: 16,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleSection: {
-    marginTop: 20,
-    marginBottom: 32,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 32,
-  },
-  toggleLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#374151',
-  },
-  form: {
-    marginBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    height: 56,
-    borderWidth: 1,
-    borderColor: '#E8D5C4',
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#111827',
-  },
-  eyeButton: {
-    padding: 4,
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: '#FF8C42',
-    fontWeight: '500',
-  },
-  loginButton: {
-    backgroundColor: '#6B7C4A',
-    paddingVertical: 18,
-    borderRadius: 30,
-    alignItems: 'center',
-    shadowColor: '#6B7C4A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  loginButtonText: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  buttonPressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.98 }],
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  signUpContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 'auto',
-  },
-  signUpText: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  signUpLink: {
-    fontSize: 14,
-    color: '#6B7C4A',
-    fontWeight: '600',
-  },
-});
+const createStyles = (theme: any, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingHorizontal: spacing[6],
+      paddingBottom: spacing[10],
+    },
+    headerSection: {
+      alignItems: 'center',
+      marginTop: spacing[8],
+      marginBottom: spacing[6],
+    },
+    logoContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: borderRadius['2xl'],
+      backgroundColor: isDark ? colors.neutral[800] : colors.primary[50],
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing[4],
+    },
+    appName: {
+      fontSize: typography.fontSize['2xl'],
+      fontWeight: typography.fontWeight.bold,
+      color: theme.colors.text,
+    },
+    tagline: {
+      fontSize: typography.fontSize.sm,
+      color: theme.colors.textSecondary,
+      marginTop: spacing[1],
+    },
+    titleSection: {
+      marginBottom: spacing[6],
+    },
+    title: {
+      fontSize: typography.fontSize['3xl'],
+      fontWeight: typography.fontWeight.bold,
+      color: theme.colors.text,
+      marginBottom: spacing[2],
+    },
+    subtitle: {
+      fontSize: typography.fontSize.base,
+      color: theme.colors.textSecondary,
+    },
+    toggleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: isDark ? colors.neutral[800] : colors.white,
+      padding: spacing[4],
+      borderRadius: borderRadius.lg,
+      marginBottom: spacing[6],
+      ...shadows.sm,
+    },
+    toggleLabel: {
+      fontSize: typography.fontSize.base,
+      fontWeight: typography.fontWeight.medium,
+      color: theme.colors.text,
+    },
+    form: {
+      marginBottom: spacing[6],
+    },
+    inputContainer: {
+      marginBottom: spacing[4],
+    },
+    inputLabel: {
+      fontSize: typography.fontSize.sm,
+      fontWeight: typography.fontWeight.medium,
+      color: theme.colors.text,
+      marginBottom: spacing[2],
+    },
+    inputWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDark ? colors.neutral[800] : colors.white,
+      borderRadius: borderRadius.lg,
+      paddingHorizontal: spacing[4],
+      height: 56,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    inputIcon: {
+      marginRight: spacing[3],
+    },
+    input: {
+      flex: 1,
+      fontSize: typography.fontSize.base,
+      color: theme.colors.text,
+    },
+    eyeButton: {
+      padding: spacing[1],
+    },
+    optionsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing[6],
+    },
+    rememberMe: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: borderRadius.sm,
+      borderWidth: 2,
+      borderColor: theme.colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: spacing[2],
+    },
+    checkboxChecked: {
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.primary,
+    },
+    rememberMeText: {
+      fontSize: typography.fontSize.sm,
+      color: theme.colors.textSecondary,
+    },
+    forgotPasswordText: {
+      fontSize: typography.fontSize.sm,
+      color: theme.colors.primary,
+      fontWeight: typography.fontWeight.medium,
+    },
+    loginButton: {
+      backgroundColor: theme.colors.primary,
+      paddingVertical: spacing[4],
+      borderRadius: borderRadius.full,
+      alignItems: 'center',
+      ...shadows.md,
+    },
+    loginButtonText: {
+      color: colors.white,
+      fontSize: typography.fontSize.lg,
+      fontWeight: typography.fontWeight.semibold,
+    },
+    buttonPressed: {
+      opacity: 0.9,
+      transform: [{ scale: 0.98 }],
+    },
+    buttonDisabled: {
+      opacity: 0.7,
+    },
+    biometricButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing[4],
+      marginTop: spacing[4],
+      borderRadius: borderRadius.full,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      gap: spacing[2],
+    },
+    biometricButtonText: {
+      fontSize: typography.fontSize.base,
+      color: theme.colors.primary,
+      fontWeight: typography.fontWeight.medium,
+    },
+    signUpContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 'auto',
+    },
+    signUpText: {
+      fontSize: typography.fontSize.sm,
+      color: theme.colors.textSecondary,
+    },
+    signUpLink: {
+      fontSize: typography.fontSize.sm,
+      color: theme.colors.primary,
+      fontWeight: typography.fontWeight.semibold,
+    },
+  });

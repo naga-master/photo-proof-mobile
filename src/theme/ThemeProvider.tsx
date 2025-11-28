@@ -1,132 +1,149 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/**
+ * Theme Provider with Multi-Tenant Branding Support
+ */
+
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
 
-export interface Theme {
-  colors: {
-    background: string;
-    surface: string;
-    primary: string;
-    secondary: string;
-    accent: string;
-    error: string;
-    success: string;
-    warning: string;
-    text: string;
-    textSecondary: string;
-    border: string;
-  };
-  spacing: {
-    xs: number;
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-    xxl: number;
-  };
-  borderRadius: {
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-    full: number;
-  };
-  typography: {
-    fontFamily: string;
-    sizes: {
-      xs: number;
-      sm: number;
-      base: number;
-      lg: number;
-      xl: number;
-      xxl: number;
-      xxxl: number;
-    };
-    weights: {
-      light: string;
-      regular: string;
-      medium: string;
-      semibold: string;
-      bold: string;
-    };
-  };
-}
+import {
+  Theme,
+  lightTheme,
+  darkTheme,
+  createStudioTheme,
+} from './index';
+import { apiClient } from '../services/api/client';
+import { useAuthStore } from '../stores/authStore';
 
-const lightTheme: Theme = {
-  colors: {
-    background: '#FFF5E8',
-    surface: '#FFFFFF',
-    primary: '#6B7C4A',
-    secondary: '#D4A574',
-    accent: '#FF8C42',
-    error: '#D85B4C',
-    success: '#6B9C4A',
-    warning: '#FF8C42',
-    text: '#111827',
-    textSecondary: '#6B7280',
-    border: '#E8D5C4',
-  },
-  spacing: {
-    xs: 6,
-    sm: 12,
-    md: 20,
-    lg: 28,
-    xl: 40,
-    xxl: 56,
-  },
-  borderRadius: {
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 20,
-    full: 9999,
-  },
-  typography: {
-    fontFamily: 'Inter-Regular',
-    sizes: {
-      xs: 12,
-      sm: 14,
-      base: 16,
-      lg: 18,
-      xl: 22,
-      xxl: 30,
-      xxxl: 36,
-    },
-    weights: {
-      light: '300',
-      regular: '400',
-      medium: '500',
-      semibold: '600',
-      bold: '700',
-    },
-  },
-};
+// Storage for theme preferences
+const storage = new MMKV({ id: 'theme-storage' });
 
-const darkTheme: Theme = {
-  ...lightTheme,
-  colors: {
-    background: '#1A1F14',
-    surface: '#2D3319',
-    primary: '#8A9D6B',
-    secondary: '#D4A574',
-    accent: '#FF8C42',
-    error: '#D85B4C',
-    success: '#6B9C4A',
-    warning: '#FF8C42',
-    text: '#FFFFFF',
-    textSecondary: '#9CA3AF',
-    border: '#3D4429',
-  },
-};
+// Theme mode type
+type ThemeMode = 'light' | 'dark' | 'system';
 
+// Theme context type
 interface ThemeContextType {
   theme: Theme;
+  themeMode: ThemeMode;
   isDark: boolean;
-  toggleTheme: () => void;
+  isLoading: boolean;
+  setThemeMode: (mode: ThemeMode) => void;
+  refreshBranding: () => Promise<void>;
 }
 
+// Create context
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const useTheme = () => {
+// Storage keys
+const THEME_MODE_KEY = 'theme_mode';
+
+// Props
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const systemColorScheme = useColorScheme();
+  const { user, isAuthenticated } = useAuthStore();
+
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
+  const [studioBranding, setStudioBranding] = useState<Theme['branding']>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load saved theme mode
+  useEffect(() => {
+    const savedMode = storage.getString(THEME_MODE_KEY) as ThemeMode | undefined;
+    if (savedMode) {
+      setThemeModeState(savedMode);
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Fetch studio branding when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user?.studio_id) {
+      fetchStudioBranding(user.studio_id);
+    } else {
+      setStudioBranding({});
+    }
+  }, [isAuthenticated, user?.studio_id]);
+
+  // Fetch studio branding from API
+  const fetchStudioBranding = async (studioId: string) => {
+    try {
+      const response = await apiClient.get<{
+        logo?: string;
+        studio_name?: string;
+        brand_color?: string;
+        secondary_color?: string;
+      }>(`/api/studio/${studioId}/branding`);
+
+      setStudioBranding({
+        logo: response.logo,
+        studioName: response.studio_name,
+        customPrimary: response.brand_color,
+        customSecondary: response.secondary_color,
+      });
+
+      console.log('[ThemeProvider] Studio branding loaded:', response.studio_name);
+    } catch (error) {
+      console.warn('[ThemeProvider] Failed to fetch studio branding:', error);
+      // Keep default branding on error
+    }
+  };
+
+  // Set theme mode with persistence
+  const setThemeMode = (mode: ThemeMode) => {
+    setThemeModeState(mode);
+    storage.set(THEME_MODE_KEY, mode);
+    console.log('[ThemeProvider] Theme mode changed:', mode);
+  };
+
+  // Refresh branding
+  const refreshBranding = async () => {
+    if (user?.studio_id) {
+      await fetchStudioBranding(user.studio_id);
+    }
+  };
+
+  // Determine if dark mode
+  const isDark = useMemo(() => {
+    if (themeMode === 'system') {
+      return systemColorScheme === 'dark';
+    }
+    return themeMode === 'dark';
+  }, [themeMode, systemColorScheme]);
+
+  // Build final theme
+  const theme = useMemo(() => {
+    const baseTheme = isDark ? darkTheme : lightTheme;
+    
+    // Apply studio branding if available
+    if (Object.keys(studioBranding).length > 0) {
+      return createStudioTheme(baseTheme, studioBranding);
+    }
+    
+    return baseTheme;
+  }, [isDark, studioBranding]);
+
+  const contextValue: ThemeContextType = {
+    theme,
+    themeMode,
+    isDark,
+    isLoading,
+    setThemeMode,
+    refreshBranding,
+  };
+
+  return (
+    <ThemeContext.Provider value={contextValue}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+// Hook to use theme
+export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
@@ -134,23 +151,22 @@ export const useTheme = () => {
   return context;
 };
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const systemColorScheme = useColorScheme();
-  const [isDark, setIsDark] = useState(systemColorScheme === 'dark');
+// Hook for quick access to theme colors
+export const useThemeColors = () => {
+  const { theme } = useTheme();
+  return theme.colors;
+};
 
-  useEffect(() => {
-    setIsDark(systemColorScheme === 'dark');
-  }, [systemColorScheme]);
+// Hook for quick access to spacing
+export const useSpacing = () => {
+  const { theme } = useTheme();
+  return theme.spacing;
+};
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
-
-  const theme = isDark ? darkTheme : lightTheme;
-
-  return (
-    <ThemeContext.Provider value={{ theme, isDark, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+// Hook for styled components
+export const useThemedStyles = <T extends Record<string, any>>(
+  styleFactory: (theme: Theme) => T
+): T => {
+  const { theme } = useTheme();
+  return useMemo(() => styleFactory(theme), [theme, styleFactory]);
 };
