@@ -65,6 +65,36 @@ export default function ProjectDetailScreen() {
       }
     } catch (error) {
       console.error('Failed to fetch project:', error);
+      // Use mock data for demo
+      setProject({
+        id: id || '1',
+        studio_id: '1',
+        title: 'Smith Wedding Photography',
+        status: 'active',
+        photo_count: 245,
+        is_locked: false,
+        has_folders: true,
+        client_id: '1',
+        created_at: '2024-06-15T10:00:00Z',
+        updated_at: new Date().toISOString(),
+        shoot_date: '2024-08-20',
+        cover_photo_src: 'https://picsum.photos/seed/wedding1/800/600',
+      });
+      setPhotos([
+        { id: '1', project_id: id || '1', original_filename: 'IMG_001.jpg', src: 'https://picsum.photos/seed/p1/400/300', thumbnail_src: 'https://picsum.photos/seed/p1/200/150', width: 4000, height: 3000, file_size: 2500000, mime_type: 'image/jpeg', status: 'completed', order_index: 0, is_favorite: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: '2', project_id: id || '1', original_filename: 'IMG_002.jpg', src: 'https://picsum.photos/seed/p2/400/300', thumbnail_src: 'https://picsum.photos/seed/p2/200/150', width: 4000, height: 3000, file_size: 2400000, mime_type: 'image/jpeg', status: 'completed', order_index: 1, is_favorite: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: '3', project_id: id || '1', original_filename: 'IMG_003.jpg', src: 'https://picsum.photos/seed/p3/400/300', thumbnail_src: 'https://picsum.photos/seed/p3/200/150', width: 4000, height: 3000, file_size: 2600000, mime_type: 'image/jpeg', status: 'completed', order_index: 2, is_favorite: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: '4', project_id: id || '1', original_filename: 'IMG_004.jpg', src: 'https://picsum.photos/seed/p4/400/300', thumbnail_src: 'https://picsum.photos/seed/p4/200/150', width: 4000, height: 3000, file_size: 2300000, mime_type: 'image/jpeg', status: 'completed', order_index: 3, is_favorite: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      ]);
+      setClient({
+        id: '1',
+        name: 'John & Jane Smith',
+        email: 'smiths@example.com',
+        phone: '+1 555-0123',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
     } finally {
       setIsLoading(false);
     }

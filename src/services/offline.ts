@@ -3,12 +3,9 @@
  * Handles data persistence and synchronization
  */
 
-import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { apiClient } from './api/client';
-
-// Storage instance
-const storage = new MMKV({ id: 'offline-data' });
 
 // Cache keys
 const CACHE_KEYS = {
@@ -47,25 +44,25 @@ class OfflineSyncService {
   }
 
   // Cache data with timestamp
-  cacheData<T>(key: string, data: T): void {
+  async cacheData<T>(key: string, data: T): Promise<void> {
     const cached: CachedData<T> = {
       data,
       timestamp: Date.now(),
     };
-    storage.set(key, JSON.stringify(cached));
+    await AsyncStorage.setItem(key, JSON.stringify(cached));
   }
 
   // Get cached data if not expired
-  getCachedData<T>(key: string): T | null {
+  async getCachedData<T>(key: string): Promise<T | null> {
     try {
-      const raw = storage.getString(key);
+      const raw = await AsyncStorage.getItem(key);
       if (!raw) return null;
 
       const cached: CachedData<T> = JSON.parse(raw);
       const isExpired = Date.now() - cached.timestamp > CACHE_EXPIRY_MS;
 
       if (isExpired) {
-        storage.delete(key);
+        await AsyncStorage.removeItem(key);
         return null;
       }
 
@@ -76,20 +73,20 @@ class OfflineSyncService {
   }
 
   // Clear specific cache
-  clearCache(key: string): void {
-    storage.delete(key);
+  async clearCache(key: string): Promise<void> {
+    await AsyncStorage.removeItem(key);
   }
 
   // Clear all cached data
-  clearAllCache(): void {
-    Object.values(CACHE_KEYS).forEach((key) => storage.delete(key));
+  async clearAllCache(): Promise<void> {
+    await Promise.all(Object.values(CACHE_KEYS).map((key) => AsyncStorage.removeItem(key)));
   }
 
   // Cache projects
   async cacheProjects(): Promise<void> {
     try {
       const response = await apiClient.get<{ projects: any[] }>('/api/projects/');
-      this.cacheData(CACHE_KEYS.PROJECTS, response.projects);
+      await this.cacheData(CACHE_KEYS.PROJECTS, response.projects);
       console.log('[OfflineSync] Projects cached');
     } catch (error) {
       console.error('[OfflineSync] Failed to cache projects:', error);
@@ -97,7 +94,7 @@ class OfflineSyncService {
   }
 
   // Get cached projects
-  getCachedProjects(): any[] | null {
+  async getCachedProjects(): Promise<any[] | null> {
     return this.getCachedData<any[]>(CACHE_KEYS.PROJECTS);
   }
 
@@ -105,7 +102,7 @@ class OfflineSyncService {
   async cacheClients(): Promise<void> {
     try {
       const response = await apiClient.get<{ clients: any[] }>('/v2/clients');
-      this.cacheData(CACHE_KEYS.CLIENTS, response.clients);
+      await this.cacheData(CACHE_KEYS.CLIENTS, response.clients);
       console.log('[OfflineSync] Clients cached');
     } catch (error) {
       console.error('[OfflineSync] Failed to cache clients:', error);
@@ -113,7 +110,7 @@ class OfflineSyncService {
   }
 
   // Get cached clients
-  getCachedClients(): any[] | null {
+  async getCachedClients(): Promise<any[] | null> {
     return this.getCachedData<any[]>(CACHE_KEYS.CLIENTS);
   }
 
@@ -130,7 +127,7 @@ class OfflineSyncService {
         this.cacheClients(),
       ]);
 
-      storage.set(CACHE_KEYS.LAST_SYNC, Date.now().toString());
+      await AsyncStorage.setItem(CACHE_KEYS.LAST_SYNC, Date.now().toString());
       console.log('[OfflineSync] Full sync completed');
     } catch (error) {
       console.error('[OfflineSync] Sync failed:', error);
@@ -140,8 +137,8 @@ class OfflineSyncService {
   }
 
   // Get last sync timestamp
-  getLastSyncTime(): Date | null {
-    const timestamp = storage.getString(CACHE_KEYS.LAST_SYNC);
+  async getLastSyncTime(): Promise<Date | null> {
+    const timestamp = await AsyncStorage.getItem(CACHE_KEYS.LAST_SYNC);
     return timestamp ? new Date(parseInt(timestamp, 10)) : null;
   }
 

@@ -4,16 +4,13 @@
 
 import { create } from 'zustand';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { apiClient } from '../services/api/client';
 
-// Storage for app preferences
-const storage = new MMKV({ id: 'app-storage' });
-
 // Storage keys
-const ONBOARDING_COMPLETE_KEY = 'onboarding_complete';
-const LAST_SYNC_KEY = 'last_sync';
+const ONBOARDING_COMPLETE_KEY = '@onboarding_complete';
+const LAST_SYNC_KEY = '@last_sync';
 
 interface AppState {
   // Network state
@@ -54,8 +51,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     try {
       // Load persisted state
-      const onboardingComplete = storage.getBoolean(ONBOARDING_COMPLETE_KEY) ?? false;
-      const lastSync = storage.getNumber(LAST_SYNC_KEY) ?? null;
+      const onboardingStr = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
+      const onboardingComplete = onboardingStr === 'true';
+      const lastSyncStr = await AsyncStorage.getItem(LAST_SYNC_KEY);
+      const lastSync = lastSyncStr ? parseInt(lastSyncStr, 10) : null;
 
       // Check network connectivity
       await get().checkConnectivity();
@@ -93,8 +92,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  setOnboardingComplete: (complete: boolean) => {
-    storage.set(ONBOARDING_COMPLETE_KEY, complete);
+  setOnboardingComplete: async (complete: boolean) => {
+    await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, complete.toString());
     set({ isOnboardingComplete: complete });
     console.log('[AppStore] Onboarding complete:', complete);
   },
@@ -129,7 +128,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       // This is where we would add additional sync logic
 
       const now = Date.now();
-      storage.set(LAST_SYNC_KEY, now);
+      await AsyncStorage.setItem(LAST_SYNC_KEY, now.toString());
 
       set({
         isSyncing: false,

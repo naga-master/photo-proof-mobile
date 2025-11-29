@@ -10,13 +10,13 @@ import axios, {
 } from 'axios';
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import { MMKV } from 'react-native-mmkv';
 
 import type { ApiError } from '../../types';
 
-// Storage for offline queue
-const storage = new MMKV({ id: 'offline-queue' });
+// Storage key for offline queue
+const OFFLINE_QUEUE_KEY = '@offline_queue';
 
 // API Configuration
 const getApiUrl = (): string => {
@@ -227,17 +227,17 @@ class ApiClient {
     return id;
   }
 
-  private saveOfflineQueue(): void {
+  private async saveOfflineQueue(): Promise<void> {
     try {
-      storage.set('queue', JSON.stringify(this.offlineQueue));
+      await AsyncStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(this.offlineQueue));
     } catch (error) {
       console.error('[ApiClient] Failed to save offline queue:', error);
     }
   }
 
-  private loadOfflineQueue(): void {
+  private async loadOfflineQueue(): Promise<void> {
     try {
-      const queueData = storage.getString('queue');
+      const queueData = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY);
       if (queueData) {
         this.offlineQueue = JSON.parse(queueData);
         console.log('[ApiClient] Loaded offline queue:', this.offlineQueue.length, 'items');

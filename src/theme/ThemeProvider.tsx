@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
-import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   Theme,
@@ -14,9 +14,6 @@ import {
 } from './index';
 import { apiClient } from '../services/api/client';
 import { useAuthStore } from '../stores/authStore';
-
-// Storage for theme preferences
-const storage = new MMKV({ id: 'theme-storage' });
 
 // Theme mode type
 type ThemeMode = 'light' | 'dark' | 'system';
@@ -35,7 +32,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Storage keys
-const THEME_MODE_KEY = 'theme_mode';
+const THEME_MODE_KEY = '@theme_mode';
 
 // Props
 interface ThemeProviderProps {
@@ -52,11 +49,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   // Load saved theme mode
   useEffect(() => {
-    const savedMode = storage.getString(THEME_MODE_KEY) as ThemeMode | undefined;
-    if (savedMode) {
-      setThemeModeState(savedMode);
-    }
-    setIsLoading(false);
+    const loadTheme = async () => {
+      const savedMode = await AsyncStorage.getItem(THEME_MODE_KEY);
+      if (savedMode && ['light', 'dark', 'system'].includes(savedMode)) {
+        setThemeModeState(savedMode as ThemeMode);
+      }
+      setIsLoading(false);
+    };
+    loadTheme();
   }, []);
 
   // Fetch studio branding when authenticated
@@ -93,9 +93,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   // Set theme mode with persistence
-  const setThemeMode = (mode: ThemeMode) => {
+  const setThemeMode = async (mode: ThemeMode) => {
     setThemeModeState(mode);
-    storage.set(THEME_MODE_KEY, mode);
+    await AsyncStorage.setItem(THEME_MODE_KEY, mode);
     console.log('[ThemeProvider] Theme mode changed:', mode);
   };
 
