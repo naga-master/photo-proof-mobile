@@ -89,9 +89,10 @@ export default function GalleryScreen() {
 
   const fetchPhotos = async () => {
     try {
+      // Use V2 photos endpoint
       const endpoint = currentFolderId
-        ? `/api/projects/${id}/folders/${currentFolderId}/photos`
-        : `/api/projects/${id}/photos`;
+        ? `/v2/photos/projects/${id}/photos?folder_id=${currentFolderId}`
+        : `/v2/photos/projects/${id}/photos`;
       
       const response = await apiClient.get<{ photos: Photo[] }>(endpoint);
       setPhotos(response.photos || []);
@@ -138,7 +139,8 @@ export default function GalleryScreen() {
 
   const toggleFavorite = async (photoId: string) => {
     try {
-      await apiClient.post(`/api/photos/${photoId}/favorite`);
+      // Use V2 photos endpoint
+      await apiClient.post(`/v2/photos/${photoId}/favorite`);
       setPhotos((prev) =>
         prev.map((p) => (p.id === photoId ? { ...p, is_favorite: !p.is_favorite } : p))
       );

@@ -85,7 +85,8 @@ export default function PhotoViewerScreen() {
 
   const fetchPhotoData = async () => {
     try {
-      const photoData = await apiClient.get<Photo>(`/api/photos/${id}`);
+      // Use V2 photos endpoint
+      const photoData = await apiClient.get<Photo>(`/v2/photos/${id}`);
       setPhoto(photoData);
     } catch (error) {
       console.error('Failed to fetch photo:', error);
@@ -96,9 +97,10 @@ export default function PhotoViewerScreen() {
 
   const fetchAllPhotos = async () => {
     try {
+      // Use V2 photos endpoint
       const endpoint = folderId
-        ? `/api/projects/${projectId}/folders/${folderId}/photos`
-        : `/api/projects/${projectId}/photos`;
+        ? `/v2/photos/projects/${projectId}/photos?folder_id=${folderId}`
+        : `/v2/photos/projects/${projectId}/photos`;
       
       const response = await apiClient.get<{ photos: Photo[] }>(endpoint);
       setPhotos(response.photos || []);
@@ -109,12 +111,14 @@ export default function PhotoViewerScreen() {
 
   const fetchComments = async () => {
     try {
+      // Use V2 comments endpoint
       const response = await apiClient.get<{ comments: Comment[] }>(
-        `/api/photos/${photo?.id}/comments`
+        `/v2/comments/photos/${photo?.id}`
       );
       setComments(response.comments || []);
     } catch (error) {
       console.error('Failed to fetch comments:', error);
+      setComments([]);
     }
   };
 
@@ -123,7 +127,8 @@ export default function PhotoViewerScreen() {
 
     setIsSubmittingComment(true);
     try {
-      await apiClient.post(`/api/photos/${photo.id}/comments`, {
+      // Use V2 comments endpoint
+      await apiClient.post(`/v2/comments/photos/${photo.id}`, {
         text: newComment.trim(),
       });
       setNewComment('');
@@ -138,10 +143,13 @@ export default function PhotoViewerScreen() {
   const toggleFavorite = async () => {
     if (!photo) return;
     try {
-      await apiClient.post(`/api/photos/${photo.id}/favorite`);
+      // Use V2 photos endpoint for favorite
+      await apiClient.post(`/v2/photos/${photo.id}/favorite`);
       setPhoto((prev) => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
+      // Still toggle locally for demo
+      setPhoto((prev) => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
     }
   };
 

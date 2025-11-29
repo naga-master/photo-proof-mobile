@@ -69,23 +69,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }, [isAuthenticated, user?.studio_id]);
 
   // Fetch studio branding from API
-  const fetchStudioBranding = async (studioId: string) => {
+  const fetchStudioBranding = async (_studioId: string) => {
     try {
+      // Use /api/studio/current endpoint which returns theme info
       const response = await apiClient.get<{
-        logo?: string;
-        studio_name?: string;
+        id: string;
+        name: string;
+        logo_url?: string;
         brand_color?: string;
-        secondary_color?: string;
-      }>(`/api/studio/${studioId}/branding`);
+      }>('/api/studio/current');
 
       setStudioBranding({
-        logo: response.logo,
-        studioName: response.studio_name,
+        logo: response.logo_url,
+        studioName: response.name,
         customPrimary: response.brand_color,
-        customSecondary: response.secondary_color,
       });
 
-      console.log('[ThemeProvider] Studio branding loaded:', response.studio_name);
+      console.log('[ThemeProvider] Studio branding loaded:', response.name);
     } catch (error) {
       console.warn('[ThemeProvider] Failed to fetch studio branding:', error);
       // Keep default branding on error

@@ -43,50 +43,11 @@ export default function ContractViewerScreen() {
 
   const fetchContract = async () => {
     try {
-      const contractData = await apiClient.get<Contract>(`/api/contracts/${id}`);
+      // Use V2 contracts endpoint
+      const contractData = await apiClient.get<Contract>(`/v2/contracts/${id}`);
       setContract(contractData);
     } catch (error) {
       console.error('Failed to fetch contract:', error);
-      // Use mock data for demo
-      setContract({
-        id: id || '1',
-        studio_id: '1',
-        contract_number: 'CNT-2024-001',
-        title: 'Wedding Photography Agreement',
-        content: `PHOTOGRAPHY SERVICES AGREEMENT
-
-This Agreement is entered into as of the date signed below.
-
-1. SERVICES
-The Photographer agrees to provide photography services for the Client's event on the date(s) specified.
-
-2. PAYMENT
-A non-refundable deposit of 30% is due upon signing. The remaining balance is due 14 days before the event.
-
-3. DELIVERABLES
-- High-resolution edited digital images
-- Online gallery for viewing and sharing
-- Print release for personal use
-
-4. COPYRIGHT
-The Photographer retains copyright to all images. Client receives a license for personal use.
-
-5. CANCELLATION
-If Client cancels within 30 days of the event, 50% of total fee is due. Within 14 days, 100% is due.
-
-6. LIABILITY
-Photographer's liability is limited to the total fee paid.
-
-By signing below, both parties agree to the terms and conditions outlined in this agreement.`,
-        status: 'pending',
-        project_id: '1',
-        project_title: 'Smith Wedding',
-        client_id: '1',
-        client_name: 'John & Jane Smith',
-        sent_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +74,8 @@ By signing below, both parties agree to the terms and conditions outlined in thi
 
     setIsSigning(true);
     try {
-      await apiClient.post(`/api/contracts/${id}/sign`, {
+      // Use V2 contracts endpoint
+      await apiClient.post(`/v2/contracts/${id}/sign`, {
         signature_name: signatureName,
         agreement: true,
         timestamp: new Date().toISOString(),
@@ -128,16 +90,11 @@ By signing below, both parties agree to the terms and conditions outlined in thi
       setShowSignatureModal(false);
       await fetchContract();
     } catch (error: any) {
-      // Demo success
       Toast.show({
-        type: 'success',
-        text1: 'Contract Signed',
-        text2: 'Demo: Contract signed successfully',
+        type: 'error',
+        text1: 'Signing Failed',
+        text2: error.detail || 'Could not sign the contract',
       });
-      setShowSignatureModal(false);
-      if (contract) {
-        setContract({ ...contract, status: 'signed', signed_at: new Date().toISOString() });
-      }
     } finally {
       setIsSigning(false);
     }
